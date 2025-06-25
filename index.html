@@ -47,7 +47,7 @@
             <h1 class="text-[clamp(2rem,5vw,3rem)] font-bold text-dark mb-2">
                 <i class="fa fa-clock-o text-primary mr-3"></i>时间戳转换工具
             </h1>
-            <p class="text-secondary text-lg">轻松转换时间戳与日期时间</p>
+            <p class="text-secondary text-lg">轻松转换时间戳与日期时间（精确到秒）</p>
         </header>
 
         <!-- 当前时间卡片 -->
@@ -61,7 +61,7 @@
                     <p id="current-time" class="text-xl font-medium text-dark">--:--:--</p>
                 </div>
                 <div class="bg-gray-50 p-4 rounded-lg">
-                    <p class="text-sm text-secondary mb-1">时间戳</p>
+                    <p class="text-sm text-secondary mb-1">时间戳（秒）</p> <!-- 修改单位为秒 -->
                     <p id="current-timestamp" class="text-xl font-medium text-dark">--</p>
                 </div>
             </div>
@@ -77,12 +77,12 @@
             <div class="mb-6">
                 <div class="flex flex-col sm:flex-row gap-3 mb-3">
                     <div class="flex-1">
-                        <label for="timestamp-input" class="block text-sm font-medium text-secondary mb-1">时间戳 (毫秒)</label>
+                        <label for="timestamp-input" class="block text-sm font-medium text-secondary mb-1">时间戳 (秒)</label> <!-- 修改单位为秒 -->
                         <div class="relative">
                             <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-secondary">
                                 <i class="fa fa-clock-o"></i>
                             </span>
-                            <input type="number" id="timestamp-input" placeholder="输入时间戳..." 
+                            <input type="number" id="timestamp-input" placeholder="输入时间戳（秒）..." 
                                 class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg input-focus">
                         </div>
                     </div>
@@ -118,7 +118,7 @@
                     </div>
                 </div>
                 <div class="bg-gray-50 p-4 rounded-lg min-h-[60px]">
-                    <p class="text-sm text-secondary mb-1">转换结果</p>
+                    <p class="text-sm text-secondary mb-1">转换结果（秒）</p> <!-- 添加单位说明 -->
                     <p id="date-result" class="text-lg font-medium text-dark">--</p>
                 </div>
             </div>
@@ -132,33 +132,34 @@
             <ul class="space-y-2 text-secondary">
                 <li class="flex items-start">
                     <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
-                    <span>页面上方会实时显示当前时间和对应的时间戳</span>
+                    <span>页面上方会实时显示当前时间和对应的时间戳（秒级）</span> <!-- 添加精度说明 -->
                 </li>
                 <li class="flex items-start">
                     <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
-                    <span>在时间戳输入框中输入毫秒级时间戳，点击"转换"按钮可将其转换为日期时间</span>
+                    <span>在时间戳输入框中输入秒级时间戳（从1970-01-01 UTC开始的秒数），点击"转换"按钮可将其转换为日期时间</span> <!-- 修改单位说明 -->
                 </li>
                 <li class="flex items-start">
                     <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
-                    <span>在日期时间选择器中选择日期和时间，点击"转换"按钮可将其转换为时间戳</span>
+                    <span>在日期时间选择器中选择日期和时间，点击"转换"按钮可将其转换为秒级时间戳</span> <!-- 添加精度说明 -->
                 </li>
                 <li class="flex items-start">
                     <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
-                    <span>时间戳格式为从1970年1月1日00:00:00 UTC开始的毫秒数</span>
+                    <span>时间戳格式为从1970年1月1日00:00:00 UTC开始的秒数</span> <!-- 修改单位说明 -->
                 </li>
             </ul>
         </div>
 
         <!-- 页脚 -->
         <footer class="mt-12 text-center text-secondary text-sm">
-            <p>© 2025 时间戳转换工具 | 为开发者设计</p>
+            <p>? 2025 时间戳转换工具 | 支持秒级精度转换</p> <!-- 添加精度说明 -->
         </footer>
     </div>
 
     <script>
-        // 更新当前时间和时间戳
+        // 更新当前时间和时间戳（秒级）
         function updateCurrentTime() {
             const now = new Date();
+            // 显示精确到秒的时间
             document.getElementById('current-time').textContent = now.toLocaleString('zh-CN', {
                 year: 'numeric',
                 month: '2-digit',
@@ -168,7 +169,8 @@
                 second: '2-digit',
                 hour12: false
             });
-            document.getElementById('current-timestamp').textContent = now.getTime();
+            // 转换为秒级时间戳（原getTime()返回毫秒，除以1000取整）
+            document.getElementById('current-timestamp').textContent = Math.floor(now.getTime() / 1000);
         }
 
         // 初始化当前时间
@@ -176,18 +178,19 @@
         // 每秒更新一次
         setInterval(updateCurrentTime, 1000);
 
-        // 时间戳转日期
+        // 时间戳转日期（处理秒级输入）
         document.getElementById('convert-to-date').addEventListener('click', function() {
             const timestampInput = document.getElementById('timestamp-input');
             const timestamp = timestampInput.value;
             
             if (!timestamp) {
-                document.getElementById('timestamp-result').textContent = '请输入时间戳';
+                document.getElementById('timestamp-result').textContent = '请输入时间戳（秒）';
                 return;
             }
             
             try {
-                const date = new Date(parseInt(timestamp));
+                // 秒级时间戳需转换为毫秒（乘以1000）
+                const date = new Date(parseInt(timestamp) * 1000);
                 document.getElementById('timestamp-result').textContent = date.toLocaleString('zh-CN', {
                     year: 'numeric',
                     month: '2-digit',
@@ -199,11 +202,11 @@
                     timeZoneName: 'short'
                 });
             } catch (error) {
-                document.getElementById('timestamp-result').textContent = '无效的时间戳';
+                document.getElementById('timestamp-result').textContent = '无效的时间戳（秒）';
             }
         });
 
-        // 日期转时间戳
+        // 日期转时间戳（返回秒级）
         document.getElementById('convert-to-timestamp').addEventListener('click', function() {
             const dateInput = document.getElementById('date-input');
             const dateString = dateInput.value;
@@ -214,23 +217,22 @@
             }
             
             try {
-                // 处理时区问题，将本地时间转换为UTC时间
+                // 转换为毫秒时间戳后除以1000取整
                 const date = new Date(dateString);
-                const timestamp = date.getTime();
+                const timestamp = Math.floor(date.getTime() / 1000);
                 document.getElementById('date-result').textContent = timestamp;
             } catch (error) {
                 document.getElementById('date-result').textContent = '无效的日期时间';
             }
         });
 
-        // 设置当前时间为日期输入框的默认值
+        // 设置当前时间为日期输入框的默认值（精确到秒）
         document.addEventListener('DOMContentLoaded', function() {
             const now = new Date();
-            // 格式化为YYYY-MM-DDTHH:mm
-            const formattedDate = now.toISOString().slice(0, 16);
+            // 格式化为YYYY-MM-DDTHH:mm:ss（包含秒）
+            const formattedDate = now.toISOString().slice(0, 19).replace('T', 'T'); // 保留秒部分
             document.getElementById('date-input').value = formattedDate;
         });
     </script>
 </body>
 </html>
-    
